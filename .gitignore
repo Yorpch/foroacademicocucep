@@ -1,9 +1,22 @@
-# Node modules
+# Dependencias de Node
 node_modules/
 
-# Logs
-npm-debug.log
-yarn-error.log
-
-# Env files
+# Archivos de entorno (variables sensibles)
 .env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Archivos del sistema (Windows / macOS)
+.DS_Store
+Thumbs.db
+
+# Archivos temporales o de respaldo
+*.bak
+*.tmp
+
+# Configuración de IDE (Visual Studio Code)
+.vscode/
