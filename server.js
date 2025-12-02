@@ -1,16 +1,18 @@
 const express = require('express');
 const app = express();
-const rutas = require('./routes/index.js');
+const rutas = require('./routes/index. js');
 const path = require('path');
+const cors = require('cors');
 
 // Silenciar dotenv
-process.env.DOTENV_CONFIG_QUIET = 'true';
+process.env. DOTENV_CONFIG_QUIET = 'true';
 require('dotenv').config({ silent: true });
 
-app.use(express.json());
+app.use(cors());
+app. use(express.json());
 
 // Servir archivos estáticos CORRECTAMENTE
-app.use(express.static('public'));
+app.use(express.static('Public'));
 
 // Middleware de logging
 app.use((req, res, next) => {
@@ -20,7 +22,7 @@ app.use((req, res, next) => {
 
 // Ruta principal
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'Public', 'index.html'));
 });
 
 // API routes
@@ -44,23 +46,23 @@ const pages = [
 
 pages.forEach(page => {
   app.get(`/${page}`, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', `${page}.html`));
+    res.sendFile(path.join(__dirname, 'Public', `${page}. html`));
   });
   console.log(`✅ Ruta registrada: /${page}`);
 });
 
 // Para cualquier otra ruta, servir index.html
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'Public', 'index.html'));
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 3000;
+app. listen(PORT, () => {
   console.log(`
   ====================================
   🚀 SERVIDOR INICIADO
   📍 http://localhost:${PORT}
-  📂 Archivos: ./public/
+  📂 Archivos: ./Public/
   ====================================
   `);
 });
