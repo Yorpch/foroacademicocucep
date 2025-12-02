@@ -1,18 +1,18 @@
 const bcrypt = require('bcryptjs');
 
 const usuarios = [
-  { email: 'admin@cucep.edu.mx', password: 'admin123' },
-  { email: 'juan.perez@cucep.edu.mx', password: 'admin123' },
-  { email: 'maria.gonzalez@cucep.edu.mx', password: 'admin123' }
+  'test@cucep.edu.mx',
+  'estudiante1@cucep.edu.mx',
+  'auto@cucep.edu.mx',
+  'admin@cucep.edu.mx',
+  'admin2@cucep.edu.mx',
+  'admin3@cucep.edu.mx',
+  'profesor.func@cucep.edu.mx'
 ];
 
-console.log('Generando hashes con bcryptjs...\n');
-
-usuarios.forEach(usuario => {
-  const hash = bcrypt.hashSync(usuario.password, 10);
-  console.log(`-- ${usuario.email}`);
-  console.log(`UPDATE usuario SET password_hash = '${hash}' WHERE email = '${usuario.email}';`);
-  console.log('');
-});
-
-console.log('\n✅ Copia y ejecuta estos comandos en PostgreSQL');
+(async () => {
+  for (const email of usuarios) {
+    const hash = await bcrypt.hash('admin123', 10);
+    console.log(`UPDATE usuario SET password_hash = '${hash}' WHERE email = '${email}';`);
+  }
+})();

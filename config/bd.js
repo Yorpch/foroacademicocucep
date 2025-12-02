@@ -10,7 +10,7 @@ const pool = new Pool({
 });
 
 pool.connect()
-  .then(() => console.log('✅ Conectado a la base de datos foro_academico'))
-  .catch(err => console.error('❌ Error de conexión a la base de datos', err));
+  .then(() => console.log('Conectado a la base de datos foro_academico'))
+  .catch(err => console.error(' Error de conexión a la base de datos', err));
 
 module.exports = pool;

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categoría del Foro - CUCEP</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+  
+  <!-- NAVBAR -->
+  <header class="sticky top-0 bg-white/90 backdrop-blur-sm shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 flex items-center justify-between h-16">
+      <h1 class="text-xl font-bold text-[#111418]">CUCEP</h1>
+
+      <nav class="hidden md:flex gap-8 text-sm font-medium">
+        <a class="hover:text-blue-600" href="inicio.html">Inicio</a>
+        <a class="text-blue-600 font-bold" href="foro.html">Foros</a>
+        <a class="hover:text-blue-600" href="canal.html">Canales</a>
+        <a class="logout-btn hover:text-red-600" href="#">Cerrar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTENIDO -->
+  <main class="max-w-4xl mx-auto py-10 px-4">
+
+    <!-- Información de categoría -->
+    <div id="categoria-info" class="mb-10 text-center">
+      <h2 class="text-4xl font-black tracking-tight">Cargando categoría...</h2>
+      <p class="text-gray-600 mt-2">Por favor espera...</p>
+    </div>
+
+    <!-- Lista de foros -->
+    <div id="lista-foros" class="space-y-6"></div>
+
+    <!-- Error -->
+    <div id="mensaje-error" class="hidden text-center mt-10">
+      <p class="text-red-600 text-lg font-bold">⚠ No se pudo cargar esta categoría.</p>
+      <p id="error-detalles" class="text-sm text-gray-600 mt-2"></p>
+      <button onclick="probarEndpoint()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition mr-2">
+        Probar conexión
+      </button>
+      <button onclick="location.reload()" class="mt-4 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition">
+        Reintentar
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Scripts backend -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+
+  <!-- LÓGICA -->
+  <script>
+    // Función para probar endpoints
+    async function probarEndpoint() {
+      const params = new URLSearchParams(window.location.search);
+      const categoriaId = params.get('id');
+      
+      const endpoints = [
+        `/foros/categoria/${categoriaId}`,
+        `/categoria/${categoriaId}`,
+        `/categorias/${categoriaId}`
+      ];
+      
+      for (const endpoint of endpoints) {
+        try {
+          console.log(`Probando: ${endpoint}`);
+          const response = await fetch(`http://localhost:3000/api${endpoint}`);
+          console.log(`Respuesta para ${endpoint}:`, response.status, response.statusText);
+          if (response.ok) {
+            const data = await response.json();
+            console.log('Datos recibidos:', data);
+            alert(`✅ Éxito con: ${endpoint}\n\nCategoría: ${data.nombre}`);
+            return;
+          }
+        } catch (error) {
+          console.log(`Error con ${endpoint}:`, error.message);
+        }
+      }
+      alert('❌ Ningún endpoint funcionó. Revisa la consola para más detalles.');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log("Página cargada, iniciando obtención de categoría...");
+
+      const params = new URLSearchParams(window.location.search);
+      const categoriaId = params.get('id');
+      console.log("ID de categoría obtenido de URL:", categoriaId);
+
+      if (!categoriaId) {
+        document.getElementById('categoria-info').innerHTML =
+          `<h2 class="text-3xl font-bold text-red-600">Categoría no especificada.</h2>
+           <p class="text-gray-600 mt-2">Regresa a la <a href="foro.html" class="text-blue-600 underline">página de foros</a></p>`;
+        return;
+      }
+
+      try {
+        console.log("Intentando obtener categoría...");
+        
+        // PRUEBA DIRECTA: Abre la consola y prueba manualmente
+        console.log("Para probar manualmente, escribe en la consola:");
+        console.log(`1. fetch('http://localhost:3000/api/foros/categoria/${categoriaId}')`);
+        console.log(`2. O prueba con: api.request('/foros/categoria/${categoriaId}')`);
+        
+        // Intentar con el método del api.js
+        const categoria = await api.request(`/foros/categoria/${categoriaId}`);
+        console.log("Categoría obtenida:", categoria);
+
+        // Mostrar info de la categoría
+        document.getElementById('categoria-info').innerHTML = `
+          <h2 class="text-4xl font-black">${categoria.nombre}</h2>
+          <p class="text-gray-600 mt-2">${categoria.descripcion || "Sin descripción disponible"}</p>
+        `;
+
+        // Contenedor
+        const contenedor = document.getElementById('lista-foros');
+
+        // Si no hay foros
+        if (!categoria.foros || categoria.foros.length === 0) {
+          contenedor.innerHTML =
+            `<div class="bg-white p-8 rounded-lg shadow text-center">
+              <p class="text-gray-500 text-lg">📭 No hay foros creados en esta categoría.</p>
+            </div>`;
+          return;
+        }
+
+        // Renderizar foros
+        categoria.foros.forEach(foro => {
+          const html = `
+            <div class="bg-white p-6 rounded-lg shadow border border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h3 class="text-lg font-bold text-[#111418]">${foro.nombre}</h3>
+                <p class="text-gray-600 mt-1">${foro.descripcion || ""}</p>
+              </div>
+
+              <a href="canal.html?foro=${foro.id}">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition">
+                  Entrar
+                </button>
+              </a>
+            </div>
+          `;
+          contenedor.insertAdjacentHTML('beforeend', html);
+        });
+
+      } catch (error) {
+        console.error("Error completo:", error);
+        
+        // Mostrar mensaje de error detallado
+        document.getElementById('categoria-info').innerHTML = `
+          <h2 class="text-3xl font-bold text-red-600">Error al cargar categoría</h2>
+          <p class="text-gray-600 mt-2">${error.message}</p>
+        `;
+        
+        document.getElementById('error-detalles').textContent = 
+          `URL intentada: http://localhost:3000/api/foros/categoria/${categoriaId}`;
+        document.getElementById('mensaje-error').classList.remove('hidden');
+        
+        // Mostrar instrucciones en consola
+        console.log("\n⚠️ INSTRUCCIONES PARA DEPURAR:");
+        console.log("1. Abre http://localhost:3000/api/foros/categoria/" + categoriaId);
+        console.log("2. Verifica que el servidor esté corriendo");
+        console.log("3. Revisa las rutas en tu index.js/app.js");
+        console.log("4. Verifica que el método obtenerCategoriaConForos exista en forosController.js");
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Foros de la comunidad - CUCEP</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#1f82e5",
+            "background-light": "#f6f7f8",
+            "background-dark": "#111921",
+          },
+          fontFamily: {
+            "display": ["Inter"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-[#212529] dark:text-gray-200">
+
+  <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+
+    <!-- NAVBAR -->
+    <header class="sticky top-0 z-10 w-full bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm shadow-sm">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center gap-4">
+            <h1 class="text-[#111418] dark:text-white text-xl font-bold tracking-tight">CUCEP</h1>
+          </div>
+          <nav class="hidden md:flex items-center gap-8">
+            <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary"
+              href="inicio.html">Inicio</a>
+            <a class="text-sm font-bold text-primary dark:text-primary" href="#">Foros</a>
+            <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary"
+              href="canal.html">Canales</a>
+            <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary logout-btn"
+              href="#">Cerrar sesión</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="flex-grow">
+      <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+
+        <div class="text-center mb-12">
+          <h2 class="text-[#111418] dark:text-white text-4xl font-black leading-tight">Foros de la comunidad</h2>
+          <p class="mt-4 text-[#637588] dark:text-gray-400 text-lg">
+            Participa en conversaciones, comparte ideas y colabora con otros usuarios.
+          </p>
+        </div>
+
+        <!-- CONTENEDOR QUE SE RELLENA CON LAS CATEGORÍAS -->
+        <div id="contenedor-categorias" class="space-y-6"></div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- INTEGRACIÓN BACKEND -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+
+      async function cargarCategorias() {
+        try {
+          const res = await api.request('/categorias');
+          const categorias = res.categorias;
+
+          const contenedor = document.getElementById("contenedor-categorias");
+          contenedor.innerHTML = ""; // limpiar
+
+          categorias.forEach(cat => {
+            const html = `
+              <div class="bg-white dark:bg-background-dark/50 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700/50 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex-grow">
+                  <h3 class="text-[#111418] dark:text-white text-lg font-bold">${cat.nombre}</h3>
+                  <p class="mt-1 text-[#637588] dark:text-gray-400 text-base">${cat.descripcion || "Sin descripción"}</p>
+                </div>
+                <a class="flex-shrink-0 w-full sm:w-auto" href="categoria_foro.html?id=${cat.id}">
+                  <button class="w-full flex items-center justify-center rounded-md h-9 px-4 bg-primary text-white text-sm font-medium hover:bg-primary/90">
+                    Ver temas
+                  </button>
+                </a>
+              </div>
+            `;
+            contenedor.insertAdjacentHTML("beforeend", html);
+          });
+
+        } catch (error) {
+          console.error("Error cargando categorías:", error);
+        }
+      }
+
+      cargarCategorias();
+    });
+  </script>
+
+</body>
+
+</html>
