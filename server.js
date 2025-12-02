@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const rutas = require('./routes/index. js');
+const rutas = require('./routes/index.js');
 const path = require('path');
 const cors = require('cors');
 
@@ -66,3 +66,4 @@ app. listen(PORT, () => {
   ====================================
   `);
 });
+
